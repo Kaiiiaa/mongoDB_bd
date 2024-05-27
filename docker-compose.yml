@@ -1,0 +1,34 @@
+version: '3.1'
+
+services:
+  mongo1:
+    image: mongo:latest
+    container_name: mongo1
+    ports:
+      - 27017:27017
+    command: mongod --shardsvr --replSet rs0
+
+  mongo2:
+    image: mongo:latest
+    container_name: mongo2
+    ports:
+      - 27018:27017
+    command: mongod --shardsvr --replSet rs0
+
+  configsvr:
+    image: mongo:latest
+    container_name: configsvr
+    ports:
+      - 27019:27017
+    command: mongod --configsvr --replSet csrs --port 27017
+
+  mongos:
+    image: mongo:latest
+    container_name: mongos
+    ports:
+      - 27020:27017
+    command: mongos --configdb csrs/configsvr:27017 --bind_ip_all
+
+networks:
+  default:
+    name: mongo-cluster
